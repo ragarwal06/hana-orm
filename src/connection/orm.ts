@@ -30,7 +30,10 @@ export class HanaOrm<T extends GenericType> {
    */
   async insert(args: InsertArgs<T>): Promise<boolean> {
     try {
-      await insertHana(args, this.tableName);
+      await insertHana({
+        tableName: this.tableName,
+        ...args,
+      });
     } catch (e) {
       return false;
     }
@@ -47,7 +50,13 @@ export class HanaOrm<T extends GenericType> {
     findArgs: FindArgs<T>,
     onlyOne: FindOne
   ): Promise<FindOne extends true ? T : T[]> {
-    return findHana(findArgs, this.tableName, onlyOne);
+    return findHana(
+      {
+        ...findArgs,
+        tableName: this.tableName,
+      },
+      onlyOne
+    );
   }
 
   /**
@@ -56,7 +65,10 @@ export class HanaOrm<T extends GenericType> {
    * @returns {Promise<number>} the number of affectedRows
    */
   update(args: UpdateArgs<T>): Promise<number> {
-    return updateHana(args, this.tableName);
+    return updateHana({
+      tableName: this.tableName,
+      ...args,
+    });
   }
 
   /**
@@ -65,7 +77,10 @@ export class HanaOrm<T extends GenericType> {
    * @returns {Promise<number>} the number of affectedRows
    */
   remove(args: DeleteArgs<T>): Promise<number> {
-    return removeHana(args, this.tableName);
+    return removeHana({
+      tableName: this.tableName,
+      ...args,
+    });
   }
 
   /**

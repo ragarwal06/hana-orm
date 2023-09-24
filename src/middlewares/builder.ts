@@ -6,7 +6,15 @@ import { remove } from '@/operations/remove.js';
 import { update } from '@/operations/update.js';
 import { type GenericType } from '@/types/generic.js';
 
-export const databaseOperations = () => {
+export interface DatabaseOperations {
+  insert: typeof insert;
+  find: typeof find;
+  update: typeof update;
+  remove: typeof remove;
+  prepareForTable: <T extends GenericType>(tableName: string) => HanaOrm<T>;
+}
+
+export const databaseOperations = (): DatabaseOperations => {
   return {
     insert, // create
     find, // read

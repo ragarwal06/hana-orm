@@ -16,13 +16,13 @@ export interface UpdateArgs<T> {
 
 /**
  * update the data in the database
- * @param {UpdateArgs<T>} data the required data to be processed
+ * @param {UpdateArgs<T> & SharedArgs} data the required data to be processed
  * @returns {ActionReturnType} the query for preparation with values
  */
 const updateQuery = <T extends GenericType>({
-  newValues,
-  conditions,
-  tableName,
+  newValues = {},
+  conditions = {},
+  tableName = '',
   clause = 'AND',
 }: UpdateArgs<T> & SharedArgs): ActionReturnType => {
   const whereValues: string[] = [];
@@ -48,14 +48,15 @@ const updateQuery = <T extends GenericType>({
 
 /**
  * Update the table in the database
- * @param {UpdateArgs<T>} args the required data to be update with conditions
- * @param {string} tableName the table name to do operations on
+ * @param {UpdateArgs<T> & SharedArgs} args the required data to be update with conditions
  * @returns {Promise<number>} the number of affectedRows
  */
-export const update = <T extends GenericType>(
-  { conditions, newValues, clause = 'AND' }: UpdateArgs<T>,
-  tableName: string
-): Promise<number> => {
+export const update = <T extends GenericType>({
+  conditions = {},
+  newValues = {},
+  clause = 'AND',
+  tableName = '',
+}: UpdateArgs<T> & SharedArgs): Promise<number> => {
   const [sql, values] = updateQuery({
     conditions,
     newValues,

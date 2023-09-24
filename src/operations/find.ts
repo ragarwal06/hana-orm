@@ -16,13 +16,13 @@ export interface FindArgs<T> {
 
 /**
  * Insert the query in the database
- * @param {FindArgs<T>} data the required data to be found based on conditions
+ * @param {FindArgs<T> & SharedArgs} data the required data to be found based on conditions
  * @returns {ActionReturnType} the query for preparation with values
  */
 const findQuery = <T extends GenericType>({
-  columnNames,
-  conditions,
-  tableName,
+  columnNames = [],
+  conditions = {},
+  tableName = '',
   clause = 'AND',
 }: FindArgs<T> & SharedArgs): ActionReturnType => {
   const columns = columnNames.length === 0 ? '*' : columnNames.join(', ');
@@ -40,14 +40,12 @@ const findQuery = <T extends GenericType>({
 
 /**
  * Query the database table for data based on conditions
- * @param {FindArgs<T>} args the conditions along with column filters if any
- * @param {string} tableName the table name to do operations on
+ * @param {FindArgs<T> & SharedArgs} args the conditions along with column filters if any
  * @param {Boolean} onlyOne specify if only one value has to be returned
  * @returns {Promise<T[]>} the selected data
  */
 export const find = <T extends GenericType, FindOne extends boolean>(
-  { columnNames = [], conditions, clause = 'AND' }: FindArgs<T>,
-  tableName: string,
+  { columnNames = [], conditions = {}, clause = 'AND', tableName = '' }: FindArgs<T> & SharedArgs,
   onlyOne: FindOne
 ): Promise<FindOne extends true ? T : T[]> => {
   type ReturnType = Promise<FindOne extends true ? T : T[]>;

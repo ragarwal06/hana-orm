@@ -13,12 +13,12 @@ export interface InsertArgs<T> {
 
 /**
  * Insert the query in the database
- * @param {T | GenericType} data the object with key(column)-value pair
+ * @param {T | GenericType & SharedArgs} data the object with key(column)-value pair
  * @returns {ActionReturnType} the query for preparation with values
  */
 const insertQuery = <T extends GenericType>({
+  tableName = '',
   data,
-  tableName,
 }: InsertArgs<T> & SharedArgs): ActionReturnType => {
   const keys = Object.keys(data);
   const columns = keys.join(', ');
@@ -29,18 +29,17 @@ const insertQuery = <T extends GenericType>({
 
 /**
  * Insert the query in the database
- * @param {InsertArgs<T>} args the required data to be inserted
- * @param {string} tableName the table name to do operations on
+ * @param {InsertArgs<T> & SharedArgs} args the required data to be inserted
  * @returns {Promise<boolean>} the query for preparation
  */
-export const insert = async <T extends GenericType>(
-  args: InsertArgs<T>,
-  tableName: string
-): Promise<boolean> => {
+export const insert = async <T extends GenericType>({
+  tableName = '',
+  data,
+}: InsertArgs<T> & SharedArgs): Promise<boolean> => {
   try {
     const [sql, values] = insertQuery({
-      ...args,
-      tableName: tableName,
+      data,
+      tableName,
     });
     await query<number>({ query: sql, values });
   } catch (e) {

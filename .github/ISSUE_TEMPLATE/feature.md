@@ -4,7 +4,6 @@ about: Information/structure for new feature
 title: ''
 labels: feature
 assignees: ''
-
 ---
 
 ### Goals

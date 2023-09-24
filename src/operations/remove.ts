@@ -15,12 +15,12 @@ export interface DeleteArgs<T> {
 
 /**
  * delete the data in the database
- * @param {DeleteArgs<T>} data the required data to be processed
+ * @param {DeleteArgs<T> & SharedArgs} data the required data to be processed
  * @returns {ActionReturnType} the query for preparation with values
  */
 const removeQuery = <T extends GenericType>({
   conditions = {},
-  tableName,
+  tableName = '',
   clause = 'AND',
 }: DeleteArgs<T> & SharedArgs): ActionReturnType => {
   const args = [];
@@ -36,14 +36,14 @@ const removeQuery = <T extends GenericType>({
 
 /**
  * Delete rows from table in the database
- * @param {DeleteArgs<T>} args the required data to be deleted with conditions
- * @param {string} tableName the table name to do operations on
+ * @param {DeleteArgs<T> & SharedArgs} args the required data to be deleted with conditions
  * @returns {Promise<number>} the number of affectedRows
  */
-export const remove = <T extends GenericType>(
-  { conditions, clause = 'AND' }: DeleteArgs<T>,
-  tableName: string
-): Promise<number> => {
+export const remove = <T extends GenericType>({
+  conditions = {},
+  clause = 'AND',
+  tableName = '',
+}: DeleteArgs<T> & SharedArgs): Promise<number> => {
   const [sql, values] = removeQuery({
     conditions,
     clause,

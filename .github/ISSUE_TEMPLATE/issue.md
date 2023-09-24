@@ -4,7 +4,6 @@ about: Information/structure for new issue
 title: ''
 labels: bug
 assignees: ''
-
 ---
 
 ### Reproduction
