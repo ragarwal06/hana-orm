@@ -12,11 +12,13 @@ export const hanaConfig = () => {
   return xsenv.cfServiceCredentials({ tag: 'hana' });
 };
 
-export const createClient = (config: hana.ConnectionOptions) => {
+export const createClient = (config: hana.ConnectionOptions, override = false) => {
   return new Promise<hana.Connection>((resolve, reject) => {
-    const conn = hana.createConnection(config);
+    if (!override && connection?.conn != undefined) return resolve(connection.conn);
+    if (connection?.conn != undefined) connection.conn.disconnect();
+    const conn = hana.createConnection();
     try {
-      conn.connect((err) => {
+      conn.connect(config, (err) => {
         if (err) reject(err);
         connection.conn = conn;
         connection.lastUpdated = new Date();

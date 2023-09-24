@@ -10,7 +10,6 @@ export interface QueryParams {
 
 /**
  * Execute queries
- * @private
  * @param query the query string
  * @param values the query values if any
  * @returns<ReturnType> unknow for DDL, number of affectedRows for DML & values for DAL

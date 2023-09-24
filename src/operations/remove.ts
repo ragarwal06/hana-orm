@@ -9,7 +9,7 @@ import { query } from './query.js';
  * @property {string} clause the required clause
  */
 export interface DeleteArgs<T> {
-  conditions: Partial<T>;
+  conditions?: Partial<T>;
   clause?: 'AND' | 'OR';
 }
 
@@ -26,10 +26,11 @@ const removeQuery = <T extends GenericType>({
   const args = [];
   const values = [];
   for (const [key, value] of Object.entries(conditions)) {
-    args.push(`${key} = ?`);
+    args.push(`"${key}" = ?`);
     values.push(value);
   }
 
+  tableName = `"${tableName}"`;
   if (args.length == 0) return [`DELETE FROM ${tableName}`, values];
   return [`DELETE FROM ${tableName} WHERE ${args.join(' ' + clause + ' ')}`, values];
 };

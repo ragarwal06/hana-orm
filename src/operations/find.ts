@@ -9,8 +9,8 @@ import { query } from './query.js';
  * @property {(keyof T)[]} columnNames the column names
  */
 export interface FindArgs<T> {
-  conditions: Partial<T>;
-  columnNames: Array<keyof T>;
+  conditions?: Partial<T>;
+  columnNames?: Array<keyof T>;
   clause?: 'AND' | 'OR';
 }
 
@@ -25,15 +25,17 @@ const findQuery = <T extends GenericType>({
   tableName = '',
   clause = 'AND',
 }: FindArgs<T> & SharedArgs): ActionReturnType => {
-  const columns = columnNames.length === 0 ? '*' : columnNames.join(', ');
+  const columns =
+    columnNames.length === 0 ? '*' : columnNames.map((value) => `"${value.toString()}"`).join(', ');
 
   const args: string[] = [];
   const values = [];
   for (const [key, value] of Object.entries(conditions)) {
-    args.push(`${key} = ?`);
+    args.push(`"${key}" = ?`);
     values.push(value);
   }
 
+  tableName = `"${tableName}"`;
   if (args.length == 0) return [`SELECT ${columns} FROM ${tableName}`, values];
   return [`SELECT ${columns} FROM ${tableName} WHERE ${args.join(' ' + clause + ' ')}`, values];
 };
@@ -41,24 +43,45 @@ const findQuery = <T extends GenericType>({
 /**
  * Query the database table for data based on conditions
  * @param {FindArgs<T> & SharedArgs} args the conditions along with column filters if any
- * @param {Boolean} onlyOne specify if only one value has to be returned
  * @returns {Promise<T[]>} the selected data
  */
-export const find = <T extends GenericType, FindOne extends boolean>(
-  { columnNames = [], conditions = {}, clause = 'AND', tableName = '' }: FindArgs<T> & SharedArgs,
-  onlyOne: FindOne
-): Promise<FindOne extends true ? T : T[]> => {
-  type ReturnType = Promise<FindOne extends true ? T : T[]>;
+export const find = <T extends GenericType>({
+  columnNames = [],
+  conditions = {},
+  clause = 'AND',
+  tableName = '',
+}: FindArgs<T> & SharedArgs): Promise<T[]> => {
   const [sql, values] = findQuery({
     columnNames,
     conditions,
     clause,
     tableName,
   });
+  return query<T[]>({
+    query: sql,
+    values,
+  });
+};
 
-  if (!onlyOne) return query<T[]>({ query: sql, values }) as ReturnType;
+/**
+ * Query the database table for data based on conditions
+ * @param {FindArgs<T> & SharedArgs} args the conditions along with column filters if any
+ * @returns {Promise<T[]>} the selected data
+ */
+export const findOne = <T extends GenericType>({
+  columnNames = [],
+  conditions = {},
+  clause = 'AND',
+  tableName = '',
+}: FindArgs<T> & SharedArgs): Promise<T> => {
+  const [sql, values] = findQuery({
+    columnNames,
+    conditions,
+    clause,
+    tableName,
+  });
   return query<T>({
     query: `${sql} LIMIT 1`,
     values,
-  }) as ReturnType;
+  });
 };

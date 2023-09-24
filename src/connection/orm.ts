@@ -1,5 +1,5 @@
 import { insert as insertHana, type InsertArgs } from '@/operations/insert.js';
-import { find as findHana, type FindArgs } from '@/operations/find.js';
+import { find as findHana, type FindArgs, findOne as findOneHana } from '@/operations/find.js';
 import { type GenericType } from '@/types/generic.js';
 import type hana from '@sap/hana-client';
 import { update as updateHana, type UpdateArgs } from '@/operations/update.js';
@@ -43,20 +43,25 @@ export class HanaOrm<T extends GenericType> {
   /**
    * Query the database table for data based on conditions
    * @param {FindArgs<T>} args the conditions along with column filters if any
-   * @param {Boolean} onlyOne specify if only one value has to be returned
    * @returns {Promise<T[]>} the selected data
    */
-  find<FindOne extends boolean>(
-    findArgs: FindArgs<T>,
-    onlyOne: FindOne
-  ): Promise<FindOne extends true ? T : T[]> {
-    return findHana(
-      {
-        ...findArgs,
-        tableName: this.tableName,
-      },
-      onlyOne
-    );
+  find(findArgs: FindArgs<T>): Promise<T[]> {
+    return findHana({
+      ...findArgs,
+      tableName: this.tableName,
+    });
+  }
+
+  /**
+   * Query the database table for data based on conditions for 1
+   * @param {FindArgs<T>} args the conditions along with column filters if any
+   * @returns {Promise<T>} the selected data
+   */
+  findOne(findArgs: FindArgs<T>): Promise<T> {
+    return findOneHana({
+      ...findArgs,
+      tableName: this.tableName,
+    });
   }
 
   /**

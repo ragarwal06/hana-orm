@@ -9,8 +9,8 @@ import { query } from './query.js';
  * @property {Partial<T>} newValues the values to be updated
  */
 export interface UpdateArgs<T> {
-  conditions: Partial<T>;
-  newValues: Partial<T>;
+  conditions?: Partial<T>;
+  newValues?: Partial<T>;
   clause?: 'AND' | 'OR';
 }
 
@@ -28,17 +28,18 @@ const updateQuery = <T extends GenericType>({
   const whereValues: string[] = [];
   const whereClauses = [];
   for (const [key, value] of Object.entries(conditions)) {
-    whereClauses.push(`${key} = ?`);
+    whereClauses.push(`"${key}" = ?`);
     whereValues.push(value);
   }
 
   const updatesValues: string[] = [];
   const updates = Object.keys(newValues).reduce((query, column, index) => {
     updatesValues.push(newValues[column] as string);
-    if (index === 0) return `${query} ${column} = ?`;
-    return `${query} ,${column} = ?`;
+    if (index === 0) return `${query} "${column}" = ?`;
+    return `${query} ,"${column}" = ?`;
   }, '');
 
+  tableName = `"${tableName}"`;
   if (whereClauses.length == 0) return [`UPDATE ${tableName} SET ${updates}`, updatesValues];
   return [
     `UPDATE ${tableName} SET ${updates} ${whereClauses.join(' ' + clause + ' ')}`,

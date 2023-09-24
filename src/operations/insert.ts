@@ -21,9 +21,10 @@ const insertQuery = <T extends GenericType>({
   data,
 }: InsertArgs<T> & SharedArgs): ActionReturnType => {
   const keys = Object.keys(data);
-  const columns = keys.join(', ');
+  const columns = keys.map((value) => `"${value.toString()}"`).join(', ');
   const values = keys.map(() => '?').join(', ');
 
+  tableName = `"${tableName}"`;
   return [`INSERT INTO ${tableName} (${columns}) VALUES (${values})`, Object.values(keys)];
 };
 
