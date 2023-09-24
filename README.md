@@ -83,7 +83,7 @@ client.then(() => {
   const { insert, remove, find, update, prepareForTable } =
     databaseOperations();
 
-  find<Users, false>({
+  find<Users>({
     columnNames: ["name"],
     conditions: {
       name: "",

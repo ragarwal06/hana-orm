@@ -1,10 +1,10 @@
-name: Publish to NPM
+name: Publish to Registry
 on:
   release:
     types: [created]
 
 jobs:
-  pubish-to-npm:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -12,20 +12,54 @@ jobs:
         with:
           fetch-depth: 2
 
-      - uses: pnpm/action-setup@v2.0.1
-        with:
-          version: 6.32.2
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'pnpm'
 
-      - name: Install dependencies and build
-        run: pnpm i && pnpm build
+      - name: Install dependencies
+        run: npm install
 
-      - name: Publish package
-        run: pnpm publish
+      - name: Check linting
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format
+
+      - name: Build
+        run: npm run build
+
+  publish-npmjs:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
+      - run: npm i && npm run build
+      - run: npm publish --userconfig registry/.npmrc.npmjs
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+  publish-gpr:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: https://npm.pkg.github.com/
+      - run: npm i && npm run build
+      - run: npm publish --userconfig registry/.npmrc.github
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+

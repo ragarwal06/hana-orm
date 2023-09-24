@@ -4,7 +4,7 @@ on:
     branches: [main]
 
 jobs:
-  build-on-push:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -12,24 +12,18 @@ jobs:
         with:
           fetch-depth: 2
 
-      - uses: pnpm/action-setup@v2.0.1
-        with:
-          version: 6.32.2
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       - name: Check linting
-        run: pnpm lint
+        run: npm run lint
 
       - name: Check formatting
-        run: pnpm format
+        run: npm run format
 
       - name: Build
-        run: pnpm build
+        run: npm run build
