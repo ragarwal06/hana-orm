@@ -1,6 +1,6 @@
 {
   "name": "@ragarwal06/hana-orm",
-  "version": "0.0.4-beta",
+  "version": "1.0.0",
   "description": "HANA ORM library for node js applications",
   "license": "ISC",
   "repository": {

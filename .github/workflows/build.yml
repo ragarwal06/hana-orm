@@ -6,27 +6,8 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Check linting
-        run: npm run lint
-
-      - name: Check formatting
-        run: npm run format
-
-      - name: Build
-        run: npm run build
+    uses: ragarwal06/deployer-workflow/.github/workflows/build-workflow.yml@main
